@@ -1,0 +1,4 @@
+cd /Users/poisoned/all/xcode_no_code/solver3/solver3
+git add .
+git commit -m "`date +"%y/%m/%d"`"
+git push origin master
