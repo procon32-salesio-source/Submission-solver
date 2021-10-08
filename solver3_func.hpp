@@ -86,8 +86,23 @@ void init(Node &n, vector<vector<Ido>> &m, int x, int y, int c, int cc, int cs){
     n.how_choose.push_back({x,y,0});
 }
 
-void prin(Node &n){ //Nodeをわかりやすく出力
-    int y = n.map.size(), x = n.map[0].size();
+bool isGoal(vector<vector<Ido>> &m){ //ゴールしているか しているなら1
+    for(int j = 0; j < m.size(); j++){
+        for(int i = 0; i < m[0].size(); i++){
+            if(m[j][i].gox != i || m[j][i].goy != j) return 0;
+        }
+    }
+    return 1;
+}
+
+void prin(Node &n){ //Nodeを簡単に出力
+    cout << "real cost : " << n.real_cost << endl;
+    cout << "heur cost : " << n.heur_cost << endl;
+    cout << "choosings : " << n.chooses << endl << endl;
+}
+
+void prin2(Node &n){ //Nodeをわかりやすく出力
+    int y = int(n.map.size()), x = int(n.map[0].size());
     cout << "map size -> x : " << x << ", y : " << y << endl;
     cout << "choosing -> x : " << n.choose_x << ", y : " << n.choose_y << endl;
     for(int i = 0; i < y; i++){
@@ -109,10 +124,12 @@ void prin(Node &n){ //Nodeをわかりやすく出力
     cout << endl << n.chooses << " : ";
     for(int i = 0; i < n.how_choose.size(); i++) cout << n.how_choose[i].gox << n.how_choose[i].goy << " ";
     cout << endl;
+    if(isGoal(n.map)) cout << "Happy" << endl;
+    else cout << "No" << endl;
 }
 
 int manhattan(vector<vector<Ido>> &m, int x, int y){ //マンハッタン距離を求める トーラスを考慮
-    int sizex = m[0].size(), sizey = m.size();
+    int sizex = int(m[0].size()), sizey = int(m.size());
     int nx = m[y][x].gox, ny = m[y][x].goy;
     int n;
     n = min(abs(nx - x), sizex - abs(nx - x)) + min(abs(ny - y), sizey - abs(ny - y));
@@ -135,7 +152,7 @@ Ido firstposition(vector<vector<Ido>> &m){ //初期位置を求める 一番遠�
 }
 
 bool parity(vector<vector<Ido>> &m, int x, int y){ //1選択で完成するか 可能なら1
-    int sizex = m[0].size(), sizey = m.size(), a = 0, even = 0;
+    int sizex = int(m[0].size()), sizey = int(m.size()), a = 0, even = 0;
     a = m[y][x].gox + m[y][x].goy * sizex;
     if(sizex % 2 == 1 || sizey % 2 == 1) return 1;
     vector<int> root(sizex*sizey), path(sizex*sizey);
@@ -168,8 +185,7 @@ bool parity(vector<vector<Ido>> &m, int x, int y){ //1選択で完成するか �
 }
 
 Ido all_parity(vector<vector<Ido>> &m){ //初期位置の決定 1選択でできるようなブロックのうち、一番遠いやつ
-    int sizex = m[0].size(), sizey = m.size();
-    int all = 0, p = 0, maxm = -1;
+    int sizex = int(m[0].size()), sizey = int(m.size()), maxm = -1;
     Ido d = {-1,-1,0}; //が一個もない時は-1を返す
     for(int j = 0; j < sizey; j++){
         for(int i = 0; i < sizex; i++){
@@ -203,7 +219,6 @@ Ido where(vector<vector<Ido>> &m, int x, int y){
 void heuristic(Node &n){ //heuristic(推定)関数 精度が良いほど短い手で答えが出る
     int m = 0;
     double  md = 0, smd = 0, r = 0;
-    int csiz = n.how_choose.size();
     n.heur_cost = 0;
 //    n.heur_cost = n.how_move.size();
 //    if(csiz > n.choose_limit) n.heur_cost += INF;
@@ -220,19 +235,10 @@ void heuristic(Node &n){ //heuristic(推定)関数 精度が良いほど短い�
     n.heur_cost += md + smd + r;
 }
 
-bool isGoal(vector<vector<Ido>> &m){ //ゴールしているか しているなら1
-    for(int j = 0; j < m.size(); j++){
-        for(int i = 0; i < m[0].size(); i++){
-            if(m[j][i].gox != i || m[j][i].goy != j) return 0;
-        }
-    }
-    return 1;
-}
-
 void U(vector<vector<Ido>> &m, int &x, int &y){ //Up関数
     int py = y;
     if(y != 0) y--;
-    else y = m.size()-1;
+    else y = int(m.size()-1);
     swap(m[py][x], m[y][x]);
 }
 
@@ -246,7 +252,7 @@ void D(vector<vector<Ido>> &m, int &x, int &y){ //Down関数
 void L(vector<vector<Ido>> &m, int &x, int &y){ //Left関数
     int px = x;
     if(x != 0) x--;
-    else x = m[0].size()-1;
+    else x = int(m[0].size()-1);
     swap(m[y][px], m[y][x]);
 }
 
@@ -318,7 +324,7 @@ void move_c2(Node &n, Node &n2){ //親ノードを1手選択した子ノード�
 }
 
 void pair_swap(Node &n){
-    int sizex = n.map[0].size(), sizey = n.map.size();
+    int sizex = int(n.map[0].size()), sizey = int(n.map.size());
     Ido a = {0,0,0}, u, d, r, l;
     a = firstposition(n.map);
     u = {a.gox,a.goy-1,0};
