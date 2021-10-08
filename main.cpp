@@ -12,7 +12,7 @@ using namespace std;
 int main(int argc, const char * argv[]) {
     ifstream in("input.txt");
     ofstream out("solution.txt");
-    Ido a = {0,0,0};
+//    Ido a = {0,0,0};
     int gridy, gridx, choose_limit, cost_chos, cost_swap; //縦,横,選択可能回数,選択コスト,交換コスト
     in >> gridx >> gridy >> choose_limit >> cost_chos >> cost_swap; //を読み込む
     vector<vector<Ido>> mov(gridy, vector<Ido>(gridx));
@@ -37,15 +37,13 @@ int main(int argc, const char * argv[]) {
     Node nod, nod2; //Node型 盤面の情報や移動経路を保存
     init(nod, mov, first_ido.gox, first_ido.goy, choose_limit, cost_chos, cost_swap); //init
     init(nod2, mov, first_ido.gox, first_ido.goy, choose_limit, cost_chos, cost_swap); //init
-    int now_x = first_ido.gox;
-    int now_y = first_ido.goy;
     
     auto lamb = [](const Node& a, const Node& b){ return a.heur_cost > b.heur_cost; }; //lambda関数 priority_queueに必要
     priority_queue<Node, vector<Node>, decltype(lamb)> open_list(lamb), next_list(lamb), last_list(lamb); //beamの核
     
 //    return 0;
     
-    int ov_x, ov_y, cx, cy;
+    int ov_x, ov_y;
     Ido new_d = {0,0,0};
     ov_x = max(gridx-5, 0);
     ov_y = max(gridy-5, 0);
@@ -87,7 +85,7 @@ int main(int argc, const char * argv[]) {
             }
         }
         move(nod, 'R', nod);
-        prin(nod);
+//        prin(nod);
     }
     //if ov_x end
     
@@ -122,7 +120,7 @@ int main(int argc, const char * argv[]) {
             }
         }
         move(nod, 'D', nod);
-        prin(nod);
+//        prin(nod);
     }
     //if ov_y end
     
@@ -135,7 +133,7 @@ int main(int argc, const char * argv[]) {
 //        if(nod.heur_cost <= 9) cout << nod.heur_cost;
 //        cout << nod.how_move[0];
         for(int i = 0; i < beam_size; i++){
-            siz = nod.how_move.size();
+            siz = int(nod.how_move.size());
             nod = open_list.top();
             open_list.pop();
             nod.status = 'C';
@@ -183,7 +181,7 @@ int main(int argc, const char * argv[]) {
                 cout << nod.how_choose[9].gox << nod.how_choose[9].goy << " " << parity(nod.map, nod.how_choose[9].gox, nod.how_choose[9].goy) << endl;
             }
         }
-        if(cnt % 200 == 0) prin(nod);
+//        if(cnt % 200 == 0) prin(nod);
         if(cnt >= 10000){
             cout << "a" << endl;
             break;
@@ -213,7 +211,7 @@ int main(int argc, const char * argv[]) {
     while(!isGoal(nod.map) && !open_list.empty()){
         nod = open_list.top();
         open_list.pop();
-        siz = nod.how_move.size();
+        siz = int(nod.how_move.size());
         
         if(isGoal(nod.map)) break;
         pair_swap(nod);
@@ -235,7 +233,7 @@ int main(int argc, const char * argv[]) {
         for(int i = 0; i < beam_size; i++){
             nod = open_list.top();
             open_list.pop();
-            siz = nod.how_move.size();
+            siz = int(nod.how_move.size());
             nod.status = 'C';
             if(nod.how_move[siz-1] != 'D') {
                 move(nod, 'U', nod2);
@@ -271,7 +269,7 @@ int main(int argc, const char * argv[]) {
                 cout << nod.how_choose[9].gox << nod.how_choose[9].goy << " " << parity(nod.map, nod.how_choose[9].gox, nod.how_choose[9].goy) << endl;
             }
         }
-        if(cnt % 40 == 0) prin(nod);
+//        if(cnt % 40 == 0) prin(nod);
         if(cnt >= 4000){
             cout << "a" << endl;
             break;
@@ -288,7 +286,14 @@ int main(int argc, const char * argv[]) {
     
     cout << cnt << endl;
     prin(nod);
-    if(isGoal(nod.map)) cout << "Happy " << endl;
+    if(isGoal(nod.map)){
+        int scores = 0;
+        scores += int(nod.how_move.size() - nod.chooses) * cost_swap;
+        scores += nod.chooses * cost_chos;
+        cout << "Total score : " << scores << endl;
+        if(nod.chooses > choose_limit) cout << "Not ";
+        cout << "Happy " << endl;
+    }
     cout << endl;
     
     vector<int> r1(gridx*gridy);
