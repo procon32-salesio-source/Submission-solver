@@ -217,8 +217,9 @@ Ido where(vector<vector<Ido>> &m, int x, int y){
 }
 
 void heuristic(Node &n){ //heuristic(推定)関数 精度が良いほど短い手で答えが出る
+    int sizex = int(n.map[0].size()), sizey = int(n.map.size());
     int m = 0;
-    double  md = 0, smd = 0, r = 0;
+    double  md = 0, smd = 0, r = 0, sizr = 0;
     n.heur_cost = 0;
 //    n.heur_cost = n.how_move.size();
 //    if(csiz > n.choose_limit) n.heur_cost += INF;
@@ -230,7 +231,8 @@ void heuristic(Node &n){ //heuristic(推定)関数 精度が良いほど短い�
             smd += m*m;
         }
     }
-    r = (int(mt() % 7) - 3) / 2.0;
+    sizr = (sizex+sizey) / 16.0;
+    r = (int(mt() % 7) - 3) / sizr;
     smd = sqrt(smd) / 4.0;
     n.heur_cost += md + smd + r;
 }
