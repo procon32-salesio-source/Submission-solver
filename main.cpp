@@ -32,7 +32,7 @@ int main(int argc, const char * argv[]) {
     }
     cout << first_ido.gox << " " << first_ido.goy << " " << nite << endl;
     
-    int beam_size = 300; //beam幅
+    int beam_size = 500; //beam幅
     vector<char> goal_way(0); //not using
     Node nod, nod2; //Node型 盤面の情報や移動経路を保存
     init(nod, mov, first_ido.gox, first_ido.goy, choose_limit, cost_chos, cost_swap); //init
@@ -47,6 +47,10 @@ int main(int argc, const char * argv[]) {
     Ido new_d = {0,0,0};
     ov_x = max(gridx-5, 0);
     ov_y = max(gridy-5, 0);
+//    if(gridx <= 7 && gridy <= 7){
+//        ov_x = 0;
+//        ov_y = 0;
+//    }
     if(ov_x > 0 && ov_y > 0){
         new_d = where(nod.map, gridx-1, gridy-1);
         nod.how_choose[0] = new_d;
@@ -127,9 +131,11 @@ int main(int argc, const char * argv[]) {
     nod.status = 'O';
     heuristic(nod);
     open_list.push(nod);
-    int cnt = 0, siz = 0;
+    int cnt = 0, siz = 0, big = 0;
+    if(ov_x > 0 && ov_y > 0) big = 6;
+    cout << big << endl;
     
-    while(nod.heur_cost > 6){
+    while(nod.heur_cost > big && !isGoal(nod.map)){
 //        if(nod.heur_cost <= 9) cout << nod.heur_cost;
 //        cout << nod.how_move[0];
         for(int i = 0; i < beam_size; i++){
@@ -162,7 +168,7 @@ int main(int argc, const char * argv[]) {
                 next_list.push(nod2);
             }
             if(isGoal(nod.map)) break;
-            if(nod.heur_cost <= 6) {
+            if(nod.heur_cost <= big) {
                 last_list.push(nod);
                 if(last_list.size() == 10){
                     prin(nod);
@@ -181,7 +187,7 @@ int main(int argc, const char * argv[]) {
                 cout << nod.how_choose[9].gox << nod.how_choose[9].goy << " " << parity(nod.map, nod.how_choose[9].gox, nod.how_choose[9].goy) << endl;
             }
         }
-//        if(cnt % 200 == 0) prin(nod);
+//        if(cnt % 200 == 0) prin2(nod);
         if(cnt >= 10000){
             cout << "a" << endl;
             break;
@@ -206,7 +212,7 @@ int main(int argc, const char * argv[]) {
     
     prin(nod);
     cout << "\n----\n\n";
-    beam_size = 5000;
+    beam_size = 800;
     int cnt2 = 0;
     while(!isGoal(nod.map) && !open_list.empty()){
         nod = open_list.top();
@@ -263,7 +269,7 @@ int main(int argc, const char * argv[]) {
         }
         cnt++;
         cnt2++;
-        if(cnt % 10 == 0) {
+        if(cnt % 100 == 0) {
             cout << ".";
             if(nod.chooses == nod.choose_limit){
                 cout << nod.how_choose[9].gox << nod.how_choose[9].goy << " " << parity(nod.map, nod.how_choose[9].gox, nod.how_choose[9].goy) << endl;
